@@ -21,8 +21,12 @@ import os
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+# Cấu hình intents để bot có thể đọc tin nhắn và hoạt động trong guild
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = True  # Cho phép đọc nội dung tin nhắn
+intents.guilds = True          # Cho phép truy cập thông tin guild/server
+intents.guild_messages = True  # Cho phép nhận tin nhắn từ guild
+intents.dm_messages = True     # Cho phép nhận tin nhắn direct message
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 # ====== DANH SÁCH ĐỊA ĐIỂM → THỜI GIAN HỒI (PHÚT) + TỈ LỆ (%) ======
