@@ -1,16 +1,6 @@
 {
   "records": [
     {
-      "key": "felis",
-      "label": "Felis/Bee Hive",
-      "killed_at": "2025-08-18T13:11:00+07:00",
-      "respawn_at": "2025-08-18T16:11:00+07:00",
-      "channel_id": "1406818880558596150",
-      "warned": false,
-      "done": false,
-      "rate": 50
-    },
-    {
       "key": "basila",
       "label": "Basila/Southern Wasteland",
       "killed_at": "2025-08-18T13:11:00+07:00",
@@ -39,6 +29,18 @@
       "warned": false,
       "done": false,
       "rate": 100
+    },
+    {
+      "key": "felis",
+      "label": "Felis/Bee Hive",
+      "killed_at": "2025-08-18T14:51:00+07:00",
+      "respawn_at": "2025-08-18T17:51:00+07:00",
+      "channel_id": "1406818880558596150",
+      "guild_id": "1406818880558596146",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "warned": false,
+      "done": false,
+      "rate": 50
     }
   ]
 }
