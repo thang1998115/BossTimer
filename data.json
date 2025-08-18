@@ -7,7 +7,7 @@
       "respawn_at": "2025-08-18T17:11:00+07:00",
       "channel_id": "1406818880558596150",
       "warned": false,
-      "done": false,
+      "done": true,
       "rate": 50
     },
     {
@@ -17,7 +17,7 @@
       "respawn_at": "2025-08-18T22:16:00+07:00",
       "channel_id": "1406818880558596150",
       "warned": false,
-      "done": false,
+      "done": true,
       "rate": 50
     },
     {
@@ -27,7 +27,7 @@
       "respawn_at": "2025-08-18T21:22:00+07:00",
       "channel_id": "1406818880558596150",
       "warned": false,
-      "done": false,
+      "done": true,
       "rate": 100
     },
     {
@@ -39,8 +39,20 @@
       "guild_id": "1406818880558596146",
       "timezone": "Asia/Ho_Chi_Minh",
       "warned": false,
-      "done": false,
+      "done": true,
       "rate": 50
+    },
+    {
+      "key": "pan_draeed",
+      "label": "Pan Dra'eed/Dion Hills",
+      "killed_at": "2025-08-18T13:30:00+07:00",
+      "respawn_at": "2025-08-19T01:30:00+07:00",
+      "channel_id": "1406818880558596150",
+      "guild_id": "1406818880558596146",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "warned": false,
+      "done": true,
+      "rate": 100
     }
   ]
 }
