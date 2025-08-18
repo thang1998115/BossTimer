@@ -1,0 +1,44 @@
+{
+  "records": [
+    {
+      "key": "felis",
+      "label": "Felis/Bee Hive",
+      "killed_at": "2025-08-18T13:11:00+07:00",
+      "respawn_at": "2025-08-18T16:11:00+07:00",
+      "channel_id": "1406818880558596150",
+      "warned": false,
+      "done": false,
+      "rate": 50
+    },
+    {
+      "key": "basila",
+      "label": "Basila/Southern Wasteland",
+      "killed_at": "2025-08-18T13:11:00+07:00",
+      "respawn_at": "2025-08-18T17:11:00+07:00",
+      "channel_id": "1406818880558596150",
+      "warned": false,
+      "done": false,
+      "rate": 50
+    },
+    {
+      "key": "gahareth",
+      "label": "Gahareth/Tanor Canyon",
+      "killed_at": "2025-08-18T13:16:00+07:00",
+      "respawn_at": "2025-08-18T22:16:00+07:00",
+      "channel_id": "1406818880558596150",
+      "warned": false,
+      "done": false,
+      "rate": 50
+    },
+    {
+      "key": "timitris",
+      "label": "Timitris/Floran Fields",
+      "killed_at": "2025-08-18T13:22:00+07:00",
+      "respawn_at": "2025-08-18T21:22:00+07:00",
+      "channel_id": "1406818880558596150",
+      "warned": false,
+      "done": false,
+      "rate": 100
+    }
+  ]
+}
