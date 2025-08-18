@@ -17,8 +17,10 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Management
 - **JSON File Storage**: Uses a simple JSON file (`data.json`) for persistent data storage of boss kill records
+- **Timezone Configuration**: Uses separate JSON file (`timezone.json`) to store per-guild timezone settings
 - **In-Memory Boss Configuration**: Boss locations, respawn times, spawn rates, and aliases are stored as Python dictionaries in the main application file
-- **Timezone Handling**: Implements Asia/Ho_Chi_Minh timezone for consistent time calculations
+- **Multi-Timezone Support**: Each Discord server can set its own timezone using `!timezone` command, with Asia/Ho_Chi_Minh as default
+- **Case-Insensitive Alias Matching**: Boss aliases are matched without regard to case sensitivity or spaces
 
 ### Boss Tracking System
 - **Location Mapping**: Each boss location has multiple aliases to make user input flexible (e.g., "ant", "antb3", "queen ant" all refer to the same boss)

@@ -7,9 +7,10 @@ import discord
 from discord.ext import commands, tasks
 
 # ====== CẤU HÌNH CƠ BẢN ======
-TZ = ZoneInfo("Asia/Ho_Chi_Minh")  # múi giờ VN
+DEFAULT_TZ = "Asia/Ho_Chi_Minh"  # múi giờ mặc định
 PREFIX = "!"
 DATA_FILE = "data.json"
+TIMEZONE_FILE = "timezone.json"
 
 from keep_alive import keep_alive
 
@@ -105,6 +106,32 @@ def save_data(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def load_timezone_settings():
+    try:
+        with open(TIMEZONE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {"default": DEFAULT_TZ, "guilds": {}}
+
+
+def save_timezone_settings(tz_data):
+    with open(TIMEZONE_FILE, "w", encoding="utf-8") as f:
+        json.dump(tz_data, f, ensure_ascii=False, indent=2)
+
+
+def get_timezone_for_guild(guild_id):
+    tz_data = load_timezone_settings()
+    return tz_data.get("guilds", {}).get(str(guild_id), tz_data.get("default", DEFAULT_TZ))
+
+
+def set_timezone_for_guild(guild_id, timezone):
+    tz_data = load_timezone_settings()
+    if "guilds" not in tz_data:
+        tz_data["guilds"] = {}
+    tz_data["guilds"][str(guild_id)] = timezone
+    save_timezone_settings(tz_data)
+
+
 data = load_data()
 
 
@@ -132,7 +159,9 @@ def find_key_by_alias(word: str):
 # ====== NHIỆM VỤ NỀN: NHẮC TRƯỚC 5' & BÁO "SPAWN" ======
 @tasks.loop(seconds=30)
 async def notifier():
-    now = datetime.now(TZ)
+    # Use default timezone for background task
+    default_tz = ZoneInfo(DEFAULT_TZ)
+    now = datetime.now(default_tz)
     changed = False
     for rec in data["records"]:
         # rec: {key,label,killed_at,respawn_at,channel_id,warned,done}
@@ -206,7 +235,10 @@ async def on_message(message: discord.Message):
     label, respawn_min, rate, _ = LOCATIONS[key]
 
     # dựng thời điểm "chết" theo HHMM hôm nay (nếu đã qua thì coi là ngày mai)
-    now = datetime.now(TZ)
+    guild_id = message.guild.id if message.guild else None
+    timezone_str = get_timezone_for_guild(guild_id) if guild_id else DEFAULT_TZ
+    tz = ZoneInfo(timezone_str)
+    now = datetime.now(tz)
     killed_at = now.replace(hour=int(hhmm[:2]),
                             minute=int(hhmm[2:]),
                             second=0,
@@ -229,6 +261,8 @@ async def on_message(message: discord.Message):
         "killed_at": killed_at.isoformat(),
         "respawn_at": respawn_at.isoformat(),
         "channel_id": str(message.channel.id),
+        "guild_id": str(guild_id) if guild_id else None,
+        "timezone": timezone_str,
         "warned": False,
         "done": False,
         "rate": rate
@@ -252,7 +286,11 @@ async def boss(ctx: commands.Context):
             "📭 Chưa có dữ liệu. Nhập theo mẫu: `fe 1304`, `ant 0930`, `gah 1445`, ..."
         )
 
-    now = datetime.now(TZ)
+    guild_id = ctx.guild.id if ctx.guild else None
+    timezone_str = get_timezone_for_guild(guild_id) if guild_id else DEFAULT_TZ
+    tz = ZoneInfo(timezone_str)
+    now = datetime.now(tz)
+    
     rows = []
     for r in data["records"]:
         respawn_at = datetime.fromisoformat(r["respawn_at"])
@@ -264,7 +302,7 @@ async def boss(ctx: commands.Context):
                      f"({remain_txt}) — {r['rate']}%"))
 
     rows.sort(key=lambda x: x[0])
-    msg = "**📜 Boss/Location timers:**\n" + "\n".join(r[1] for r in rows)
+    msg = f"**📜 Boss/Location timers** *(Timezone: {timezone_str})*:\n" + "\n".join(r[1] for r in rows)
     await ctx.send(msg)
 
 
@@ -296,6 +334,74 @@ async def clear(ctx: commands.Context):
     data["records"].clear()
     save_data(data)
     await ctx.send("🧹 Đã xoá toàn bộ timers.")
+
+
+@bot.command(help="Đặt múi giờ cho server này. Ví dụ: !timezone Asia/Tokyo")
+@commands.has_permissions(manage_guild=True)
+async def timezone(ctx: commands.Context, *, timezone_name: str = None):
+    if not timezone_name:
+        # Hiển thị múi giờ hiện tại
+        guild_id = ctx.guild.id if ctx.guild else None
+        current_tz = get_timezone_for_guild(guild_id) if guild_id else DEFAULT_TZ
+        await ctx.send(f"🌍 Múi giờ hiện tại: **{current_tz}**\n"
+                      f"Để thay đổi: `!timezone <timezone_name>`\n"
+                      f"Ví dụ: `!timezone Asia/Tokyo`, `!timezone America/New_York`, `!timezone Europe/London`")
+        return
+    
+    try:
+        # Kiểm tra múi giờ có hợp lệ không
+        test_tz = ZoneInfo(timezone_name)
+        test_time = datetime.now(test_tz)
+        
+        guild_id = ctx.guild.id if ctx.guild else None
+        if guild_id:
+            set_timezone_for_guild(guild_id, timezone_name)
+            await ctx.send(f"✅ Đã đặt múi giờ cho server này: **{timezone_name}**\n"
+                          f"Giờ hiện tại: {test_time.strftime('%H:%M:%S %Z')}")
+        else:
+            await ctx.send("❌ Lệnh này chỉ hoạt động trong server Discord.")
+            
+    except Exception as e:
+        await ctx.send(f"❌ Múi giờ không hợp lệ: `{timezone_name}`\n"
+                      f"Ví dụ múi giờ hợp lệ:\n"
+                      f"• `Asia/Ho_Chi_Minh` (Việt Nam)\n"
+                      f"• `Asia/Tokyo` (Nhật Bản)\n"
+                      f"• `America/New_York` (Mỹ - Đông)\n"
+                      f"• `America/Los_Angeles` (Mỹ - Tây)\n"
+                      f"• `Europe/London` (Anh)\n"
+                      f"• `Australia/Sydney` (Úc)")
+
+
+@bot.command(help="Danh sách múi giờ phổ biến")
+async def timezones(ctx: commands.Context):
+    timezones_list = """**🌍 Danh sách múi giờ phổ biến:**
+
+**Châu Á:**
+• `Asia/Ho_Chi_Minh` - Việt Nam
+• `Asia/Bangkok` - Thái Lan  
+• `Asia/Tokyo` - Nhật Bản
+• `Asia/Seoul` - Hàn Quốc
+• `Asia/Singapore` - Singapore
+• `Asia/Shanghai` - Trung Quốc
+• `Asia/Manila` - Philippines
+
+**Châu Âu:**
+• `Europe/London` - Anh
+• `Europe/Paris` - Pháp
+• `Europe/Berlin` - Đức
+• `Europe/Moscow` - Nga
+
+**Châu Mỹ:**
+• `America/New_York` - Mỹ (Đông)
+• `America/Chicago` - Mỹ (Trung)
+• `America/Los_Angeles` - Mỹ (Tây)
+
+**Châu Úc:**
+• `Australia/Sydney` - Sydney
+• `Australia/Melbourne` - Melbourne
+
+Sử dụng: `!timezone <tên_múi_giờ>`"""
+    await ctx.send(timezones_list)
 
 
 # ====== CHẠY BOT ======
