@@ -29,6 +29,7 @@ intents.message_content = True  # Cho phép đọc nội dung tin nhắn
 intents.guilds = True          # Cho phép truy cập thông tin guild/server
 intents.guild_messages = True  # Cho phép nhận tin nhắn từ guild
 intents.dm_messages = True     # Cho phép nhận tin nhắn direct message
+intents.voice_states = True  
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 # ====== DANH SÁCH ĐỊA ĐIỂM → THỜI GIAN HỒI (PHÚT) + TỈ LỆ (%) ======
