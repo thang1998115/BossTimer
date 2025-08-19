@@ -1,5 +1,3 @@
-import sys
-sys.modules['audioop'] = None
 import json
 import re
 from datetime import datetime, timedelta
